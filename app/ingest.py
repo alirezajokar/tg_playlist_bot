@@ -75,7 +75,9 @@ def parse_export(data: Any, source_chat_id: int) -> Iterator[Track]:
     for m in chat.get("messages", []):
         if m.get("type") != "message":
             continue
-        is_audio = m.get("media_type") == "audio_file" or str(m.get("mime_type", "")).startswith("audio/")
+        media = m.get("media_type")
+        # music = audio_file, or an audio/* document (no media_type); voice/video notes are not music
+        is_audio = media == "audio_file" or (media is None and str(m.get("mime_type", "")).startswith("audio/"))
         if not is_audio or not isinstance(m.get("id"), int):
             continue
         file_name = m.get("file_name") or ""

@@ -25,9 +25,8 @@ def export(chat_id=1234567890, messages=None):
 
 def test_parse_single_channel():
     tracks = parse_export_bytes(json.dumps(export()).encode(), SRC)
-    # voice message (media_type voice_message but audio/ogg mime) is accepted only if mime is audio/*
     ids = [t.message_id for t in tracks]
-    assert 3 in ids and 5 in ids and 2 not in ids and 1 not in ids
+    assert ids == [3, 5]  # service msg, plain text and voice message (id 4) are skipped
     t = next(t for t in tracks if t.message_id == 3)
     assert (t.performer, t.title, t.caption, t.duration) == ("Ebi", "Shab", "nice #remix #rap", 200)
     assert next(t for t in tracks if t.message_id == 5).file_name == "Song.mp3"

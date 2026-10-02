@@ -1,0 +1,31 @@
+services:
+  bot:
+    build: .
+    restart: unless-stopped
+    environment:
+      BOT_TOKEN: ${BOT_TOKEN:?set BOT_TOKEN}
+      OWNER_IDS: ${OWNER_IDS:?set OWNER_IDS}
+      SOURCE_CHANNEL_ID: ${SOURCE_CHANNEL_ID:?set SOURCE_CHANNEL_ID}
+      PLAYLIST_CHANNEL_ID: ${PLAYLIST_CHANNEL_ID:?set PLAYLIST_CHANNEL_ID}
+      SEND_DELAY: ${SEND_DELAY:-1.0}
+      MAX_PLAYLIST_SIZE: ${MAX_PLAYLIST_SIZE:-500}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    volumes:
+      - bot_data:/data        # SQLite database (survives redeploys)
+    # hardening: no inbound ports (long polling), read-only rootfs, no capabilities
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 256m
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  bot_data:
